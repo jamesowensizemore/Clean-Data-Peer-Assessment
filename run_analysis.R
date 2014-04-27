@@ -11,7 +11,9 @@ testlabels<-read.table(".\\test\\y_test.txt")
    for(i in 1:2947){
         testlabels[i, 1]<-label[testlabels[i, 1], 2]
    }
-   
+## Read in the test subjects
+testsubject<-read.table(".\\test\\subject_test.txt")
+
 ## Reads into R the table for the "test" values"
 testdata<-read.table(".\\test\\X_test.txt")
 
@@ -23,7 +25,11 @@ trainlabels<-read.table(".\\train\\y_train.txt")
 ## Replaces the numbers in the train subject labels with the appropriate descriptive name for the activity
     for(i in 1:2947){
     trainlabels[i, 1]<-label[trainlabels[i, 1], 2]
-}
+    }
+
+## Read in the train subjects
+trainsubject<-read.table(".\\train\\subject_train.txt") 
+
 ## Reads into R the table for the "train values"
 traindata<-read.table(".\\train\\X_train.txt")
 
@@ -31,7 +37,8 @@ traindata<-read.table(".\\train\\X_train.txt")
 totaldata<-rbind(testdata, traindata)
 ## Combine the labels for the above two dataframes into a single "labeling" dataframe by putting "testdata" on top and "traindata" on bottom
 TotalLabels<-rbind(testlabels, trainlabels)
-
+## Combine the subject dataframe into a single dataframe by puttin "testsubject" on top and "trainsubject" on bottom
+TotalSub<-rbind(testsubject, trainsubject)
 
 
 
@@ -44,7 +51,7 @@ ColList<-c(1:6, 41:46, 81:86, 121:126, 161:166, 201, 202, 214, 215, 227, 228, 24
 datameans<-totaldata[, ColList]
 
 ## Creates a character vector with descriptive names for each of the columns
-MeasNames<-c("Activity", "tBodyAcc-mean()-X", "tBodyAcc-mean()-Y", "tBodyAcc-mean()-Z", "tBodyAcc-std()-X", 
+MeasNames<-c("Subject", "Activity", "tBodyAcc-mean()-X", "tBodyAcc-mean()-Y", "tBodyAcc-mean()-Z", "tBodyAcc-std()-X", 
              "tBodyAcc-std()-Z", "tBodyAcc-std()-Z", "tGravityAcc-mean()-X", "tGravityAcc-mean()-Y", 
              "tGravityAcc-mean()-Z", "tGravityAcc-std()-X", "tGravityAcc-std()-Y", "tGravityAcc-std()-Z",
              "tBodyAccJerk-mean()-X", "tBodyAccJerk-mean()-Y", "tBodyAccJerk-mean()-Z", "tBodyAccJerk-std()-X",
@@ -62,10 +69,13 @@ MeasNames<-c("Activity", "tBodyAcc-mean()-X", "tBodyAcc-mean()-Y", "tBodyAcc-mea
              "fBodyBodyGyroMag-mean()", "fBodyBodyGyroMag-std()", "fBodyBodyGyroJerkMag-mean()", "fBodyBodyGyroJerkMag-std()")
 
 
-## Adds the descriptive activity labels to the first column of the dataframe
-TotalData<-cbind(TotalLabels, datameans)
+## Adds the subject number to the first column and the descriptive activity labels to the second column of the "datameans" dataframe
+TotalData<-cbind(TotalSub, TotalLabels, datameans)
 ## Renames the columns of "datameans" to the descriptive names desired
 colnames(TotalData)<-MeasNames
+
+## Reorder the "TotalData" dataframe by the subject number
+TotalData<-TotalData[order(TotalData[,1]),]
 
 ## Outputs the final version of the dataframe to a .txt (text) file
 write.table(TotalData, "TotalData.txt", sep = " ")
